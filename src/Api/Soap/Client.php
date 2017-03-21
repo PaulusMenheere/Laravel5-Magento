@@ -94,11 +94,15 @@ class Client extends \SoapClient
         return $this->__getFunctions();
     }
 
+    /**
+     * @param $name
+     * @param array $arguments
+     * @return mixed
+     */
     public function call($name, $arguments = [])
     {
         $arguments = is_array($arguments) ? $arguments : [$arguments];
-        $parameters = array_merge([$this->session, $name], [$arguments]);
-        return $this->__soapCall('call', $parameters);
+        return $this->__soapCall('call', compact('name', 'arguments'));
     }
 
     /**
@@ -114,6 +118,8 @@ class Client extends \SoapClient
     }
 
     /**
+     * Simple override to inject Session if available
+     *
      * @param string $function_name
      * @param array $arguments
      * @param null $options
@@ -123,9 +129,26 @@ class Client extends \SoapClient
      */
     public function __soapCall($function_name, $arguments, $options = null, $input_headers = null, &$output_headers = null)
     {
-//        if (!is_null($this->session)) {
-//            $arguments = [$this->session, $arguments];
-//        }
+        $arguments = $this->mapArguments($arguments);
         return parent::__soapCall($function_name, $arguments, $options, $input_headers, $output_headers);
+    }
+
+    /**
+     * Map arguments based on the API version
+     *
+     * @param $arguments
+     * @return array
+     */
+    protected function mapArguments($arguments)
+    {
+        if (is_null($this->session)) {
+            return $arguments;
+        }
+
+        if ($this->getApiVersion() == 'v1') {
+            return array_merge([$this->session, $arguments['name']], $arguments['arguments']);
+        }
+
+        return [$this->session, $arguments];
     }
 }
