@@ -1,4 +1,5 @@
 <?php
+
 namespace MichaelMartin\Magento\Api\Soap;
 
 class Client extends \SoapClient
@@ -83,30 +84,34 @@ class Client extends \SoapClient
     }
 
     /**
-     *	Get Functions
+     *    Get Functions
      *
-     *	Extension of the __getFunctions method core to SoapClient
+     *    Extension of the __getFunctions method core to SoapClient
      *
-     *	@return array
+     * @return array
      */
     public function getFunctions()
     {
         return $this->__getFunctions();
     }
 
+    /**
+     * @param $name
+     * @param array $arguments
+     * @return mixed
+     */
     public function call($name, $arguments = [])
     {
         $arguments = is_array($arguments) ? $arguments : [$arguments];
-        $parameters = array_merge([$this->session, $name], [$arguments]);
-        return $this->__soapCall('call', $parameters);
+        return $this->__soapCall('call', compact('name', 'arguments'));
     }
 
     /**
-     *	Get Last Response
+     *    Get Last Response
      *
-     *	Extension of the __getLastResponse method core to SoapClient
+     *    Extension of the __getLastResponse method core to SoapClient
      *
-     *	@return array
+     * @return string
      */
     public function getLastResponse()
     {
@@ -114,18 +119,37 @@ class Client extends \SoapClient
     }
 
     /**
+     * Simple override to inject Session if available
+     *
      * @param string $function_name
      * @param array $arguments
-     * @param null $options
-     * @param null $input_headers
-     * @param null $output_headers
+     * @param array|null $options
+     * @param mixed|null $input_headers
+     * @param array|null $output_headers
      * @return mixed
      */
-    public function __soapCall($function_name, $arguments, $options = null, $input_headers = null, &$output_headers = null)
+    public function __soapCall($function_name, array $arguments, array $options = null, $input_headers = null, array &$output_headers = null)
     {
-//        if (!is_null($this->session)) {
-//            $arguments = [$this->session, $arguments];
-//        }
+        $arguments = $this->mapArguments($arguments);
         return parent::__soapCall($function_name, $arguments, $options, $input_headers, $output_headers);
+    }
+
+    /**
+     * Map arguments based on the API version
+     *
+     * @param $arguments
+     * @return array
+     */
+    protected function mapArguments($arguments)
+    {
+        if (is_null($this->session)) {
+            return $arguments;
+        }
+
+        if ($this->getApiVersion() == 'v1') {
+            return array_merge([$this->session, $arguments['name']], $arguments['arguments']);
+        }
+
+        return array_merge([$this->session], $arguments);
     }
 }
