@@ -76,6 +76,41 @@ class Client extends \SoapClient
     }
 
     /**
+     * Simple override to inject Session if available
+     *
+     * @param string $function_name
+     * @param array $arguments
+     * @param array|null $options
+     * @param mixed|null $input_headers
+     * @param array|null $output_headers
+     * @return mixed
+     */
+    public function __soapCall($function_name, array $arguments, array $options = null, $input_headers = null, array &$output_headers = null)
+    {
+        $arguments = $this->mapArguments($arguments);
+        return parent::__soapCall($function_name, $arguments, $options, $input_headers, $output_headers);
+    }
+
+    /**
+     * Map arguments based on the API version
+     *
+     * @param $arguments
+     * @return array
+     */
+    protected function mapArguments($arguments)
+    {
+        if (is_null($this->session)) {
+            return $arguments;
+        }
+
+        if ($this->getApiVersion() == 'v1') {
+            return array_merge([$this->session, $arguments['name']], $arguments['arguments']);
+        }
+
+        return array_merge([$this->session], $arguments);
+    }
+
+    /**
      * @return array
      */
     protected function getAuthentication()
@@ -116,40 +151,5 @@ class Client extends \SoapClient
     public function getLastResponse()
     {
         return $this->__getLastResponse();
-    }
-
-    /**
-     * Simple override to inject Session if available
-     *
-     * @param string $function_name
-     * @param array $arguments
-     * @param array|null $options
-     * @param mixed|null $input_headers
-     * @param array|null $output_headers
-     * @return mixed
-     */
-    public function __soapCall($function_name, array $arguments, array $options = null, $input_headers = null, array &$output_headers = null)
-    {
-        $arguments = $this->mapArguments($arguments);
-        return parent::__soapCall($function_name, $arguments, $options, $input_headers, $output_headers);
-    }
-
-    /**
-     * Map arguments based on the API version
-     *
-     * @param $arguments
-     * @return array
-     */
-    protected function mapArguments($arguments)
-    {
-        if (is_null($this->session)) {
-            return $arguments;
-        }
-
-        if ($this->getApiVersion() == 'v1') {
-            return array_merge([$this->session, $arguments['name']], $arguments['arguments']);
-        }
-
-        return array_merge([$this->session], $arguments);
     }
 }

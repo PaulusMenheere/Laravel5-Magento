@@ -85,6 +85,13 @@ class Magento
         throw new \InvalidArgumentException("Connection [$name] already exists");
     }
 
+    /**
+     * Make SOAP request for Version 1
+     *
+     * @param $method string
+     * @param array $arguments
+     * @return mixed
+     */
     public function get($method, $arguments = [])
     {
         return $this->client()->call($method, $arguments);
