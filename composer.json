@@ -1,7 +1,7 @@
 {
     "name": "paulmenheere/laravel5-magento",
     "description": "A simple Magento Integration using SOAP v1 and v2. Forked from michaelkmartin/laravel5-magento",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "keywords": ["laravel", "magento", "soap"],
     "license": "MIT",
     "authors": [
@@ -12,8 +12,8 @@
     ],
     "require": {
         "php": ">=5.5.9",
-        "illuminate/contracts": "5.1.*|5.2.*|5.3.*|5.4.*|5.5.*",
-        "illuminate/support": "5.1.*|5.2.*|5.3.*|5.4.*|5.5.*"
+        "illuminate/contracts": "5.1.*|5.2.*|5.3.*|5.4.*|5.5.*|5.6.*",
+        "illuminate/support": "5.1.*|5.2.*|5.3.*|5.4.*|5.5.*|5.6.*"
     },
     "require-dev": {
         "guzzle/guzzle": "^3.7",
