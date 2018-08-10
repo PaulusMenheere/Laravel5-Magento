@@ -112,7 +112,7 @@ class Magento
      */
     protected function client()
     {
-        return new Client($this->getConnection(), ['connection_timeout' => 15]);
+        return new Client($this->getConnection(), ['connection_timeout' => 15, 'keep_alive' => false]);
     }
 
     /**
